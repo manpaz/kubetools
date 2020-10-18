@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# kubetoken
+#	Retrieve token from a namespace
+#
+#	Manuel F Martinez <manpaz@bashlinux.com>
+#	Bashlinux
+
+
+if [ -z ${1} ]; then
+	kubectl describe secret $(kubectl get secrets | grep cluster-admin | awk '{print $3}') 
+else
+	kubectl describe secret $(kubectl get secrets --namespace kube-system | grep ${1} | awk '{print $1}') --namespace kube-system
+fi
+

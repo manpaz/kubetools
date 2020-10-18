@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# kubedeploy
+#	Deploy to a specific deployment
+#	and leave a note why the change has been done
+#
+#	Manuel F Martinez <manpaz@bashlinux.com>
+#	Bashlinux
+
+# Prompt for a message
+echo "DEPLOYMENTS"
+echo "================================"
+kubectl get deployments | grep -v NAME | sort | awk '{print (NR-1)+1, $1}'
+echo
+echo -ne "=> Select a deployment:\n   "
+read -n 1 OPT
+echo
+DEP=$(kubectl get deployments | grep -v NAME | sort | awk '{print (NR-1)+1, $1}'| grep "^${OPT}" | awk '{print $2}')
+
+# Check a valid option has been passed
+if [ "${DEP}" = "" ]; then
+	echo "Wrong option!"
+	echo "Aborting ..."
+	exit 0
+fi
+
+
+# Annotation
+echo -ne "=> Change/Cause?\n   "
+read MSG
+echo
+
+# Do not deploy if there is no annotation
+if [ "${MSG}" = "" ]; then
+	echo "C'mmon $(whoami)!"
+	echo "You can't deploy without letting others know why you did that"
+	exit 0
+else
+	echo "................................"
+	echo "DEPLOYMENT: ${DEP}"
+	echo "MESSAGE::   ${MSG}"
+	echo
+	echo -n "Ready to deploy? [Y/n]: "
+	read -n 1 A
+	echo
+	if [ "${A}" = "Y" ]; then
+		# Deploy, then annotate the message
+		echo "Deploying ..."
+		kubectl rollout restart deployment ${DEP}
+		echo "Annotating ..."
+		kubectl annotate deployment ${DEP} kubernetes.io/change-cause="| $(date) | $(whoami) | ${MSG}"
+		echo "Done."
+	else
+		echo "Aborted."
+	fi
+fi
+
