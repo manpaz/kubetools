@@ -14,7 +14,7 @@ user@hostname $ ls ~/.kube
 config.dev
 config.sandbox
 ```
-Now, lets assume we just deployed the namespace `qa` in the same infrastructure hosting dev, then just copy the config file with a different `NS_NAME`
+Now, lets assume we just deployed a namespace called `qa` in the same infrastructure hosting dev, then all we have to do is just copy the config file with a different `NS_NAME`
 ```bash
 user@hostname $ cp ~/.kube/config.dev ~/config.qa
 user@hostname $ ls ~/.kube
@@ -22,14 +22,14 @@ config.dev
 config.qa
 config.sandbox
 ```
-Notice that you must copy the file, not to symlink, as this might create conflict with the way how `kubeconfig` works.
+Notice that you must copy the file, not a symlink to `config.NS_NAME` file, as this might create conflict with the way how `kubeconfig` works.
 
 Examples
 --------
 
 ### kubeconfig
 
-By default `kubeconfig` returns the list of namespaces availables:
+By default `kubeconfig` returns the list of context availables:
 ```bash
 user@hostname $ kubeconfig
 The available kubernetes clusters are:
@@ -37,7 +37,7 @@ The available kubernetes clusters are:
 	 * qa
 	 * sandbox
 
-Namespace: dev
+Context: dev
 ```
 
 If you want to change to sandbox, just append the name to the command
@@ -48,10 +48,10 @@ The available kubernetes clusters are:
          * qa
          * sandbox [ Currently Selected ]
 
-Namespace: sandbox
+Context: sandbox
 ```
 
-*NOTE:* If there are more than one namespace matching the cluster name, then, the latest version will be selected.
+*NOTE:* If there are more than one context in the cluster, then, the first on the list be selected.
 
 ### kubedeploy
 
